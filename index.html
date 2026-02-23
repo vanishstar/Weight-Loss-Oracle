@@ -136,8 +136,9 @@ margin-bottom: 3px;
 }
 .weighin-stat-label { font-size: 12px; font-weight: 600; color: #6b5d57; }
 .weighin-stat-sub { font-size: 12px; color: #6b5d57; margin-top: 2px; }
-.log-weight-row { display: flex; gap: 10px; align-items: flex-end; border-top: 1px solid #d4c8be; padding-top: 14px; }
-.log-weight-row .field { flex: 1; min-width: 0; }
+.log-weight-row { display: flex; flex-direction: column; gap: 0; border-top: 1px solid #d4c8be; padding-top: 14px; }
+.log-weight-inputs { display: flex; gap: 10px; align-items: flex-start; }
+.log-weight-inputs .field { flex: 1; min-width: 0; }
 
 /* CALORIE TARGET CARD */
 .target-row {
@@ -154,7 +155,8 @@ border-bottom: 1px solid #f0ebe6;
 .target-value.highlight { color: #1e5c38; }
 
 /* LOG FORM */
-.log-row { display: flex; gap: 10px; align-items: flex-start; }
+.log-row { display: flex; flex-direction: column; gap: 0; }
+.log-row-inputs { display: flex; gap: 10px; align-items: flex-start; }
 .field { display: flex; flex-direction: column; }
 .field-cals { flex: 1; min-width: 0; }
 
@@ -196,24 +198,51 @@ height: 100%;
 cursor: pointer;
 z-index: 2;
 }
-.date-display {
-position: relative;
-width: 144px;
-min-width: 144px;
+.date-nav {
+display: flex;
+align-items: center;
 height: 50px;
 border: 1.5px solid #d4c8be;
 border-radius: 10px;
 background: #ffffff;
+overflow: hidden;
+width: 100%;
+margin-bottom: 10px;
+}
+.date-nav-arrow {
+width: 40px;
+height: 100%;
 display: flex;
 align-items: center;
-padding: 0 14px;
-font-size: 16px;
+justify-content: center;
+background: none;
+border: none;
+font-size: 18px;
+color: #6b5d57;
+cursor: pointer;
+font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
+flex-shrink: 0;
+-webkit-appearance: none;
+padding: 0;
+tap-highlight-color: transparent;
+}
+.date-nav-arrow:active { background: #f5f2ee; }
+.date-nav-label {
+flex: 1;
+text-align: center;
+font-size: 15px;
 color: #1a1614;
 font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
-cursor: pointer;
-flex-shrink: 0;
+font-weight: 500;
+white-space: nowrap;
+padding: 0 2px;
+border-left: 1px solid #e8e0d8;
+border-right: 1px solid #e8e0d8;
+height: 100%;
+display: flex;
+align-items: center;
+justify-content: center;
 }
-.date-display span { position: relative; z-index: 1; pointer-events: none; }
 input[type=“number”]::-webkit-inner-spin-button,
 input[type=“number”]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=“number”] { -moz-appearance: textfield; }
@@ -433,18 +462,21 @@ cursor: pointer;
       </div>
     </div>
     <div class="log-weight-row">
-      <div class="field">
-        <label for="wi_dateInput">Date</label>
-        <div class="date-display">
-          <span id="wi_dateDisplay">Today</span>
-          <input type="date" id="wi_dateInput" oninput="updateDateDisplay('wi_dateInput','wi_dateDisplay')" onchange="updateDateDisplay('wi_dateInput','wi_dateDisplay')">
+      <div>
+        <label>Date</label>
+        <div class="date-nav">
+          <button class="date-nav-arrow" onclick="shiftDate('wiDate',-1)">&#8249;</button>
+          <div class="date-nav-label" id="wiDateLabel">Today</div>
+          <button class="date-nav-arrow" onclick="shiftDate('wiDate',1)">&#8250;</button>
         </div>
       </div>
-      <div class="field" style="flex:1;min-width:0">
-        <label for="wi_weightInput">Weight (lbs)</label>
-        <input type="number" id="wi_weightInput" placeholder="e.g. 165.2" step="0.1">
+      <div class="log-weight-inputs">
+        <div class="field" style="flex:1;min-width:0">
+          <label for="wi_weightInput">Weight (lbs)</label>
+          <input type="number" id="wi_weightInput" placeholder="e.g. 165.2" step="0.1">
+        </div>
+        <button class="add-btn-bottom" style="margin-top:23px" onclick="addWeighIn()">Log</button>
       </div>
-      <button class="add-btn-bottom" onclick="addWeighIn()">Log</button>
     </div>
   </div>
 
@@ -453,19 +485,22 @@ cursor: pointer;
   <div class="card">
     <div class="card-label">Log a Day</div>
     <div class="log-row">
-      <div class="field">
-        <label for="dateInput">Date</label>
-        <div class="date-display">
-          <span id="dateDisplay">Today</span>
-          <input type="date" id="dateInput" oninput="updateDateDisplay('dateInput','dateDisplay')" onchange="updateDateDisplay('dateInput','dateDisplay')">
+      <div>
+        <label>Date</label>
+        <div class="date-nav">
+          <button class="date-nav-arrow" onclick="shiftDate('calDate',-1)">&#8249;</button>
+          <div class="date-nav-label" id="calDateLabel">Today</div>
+          <button class="date-nav-arrow" onclick="shiftDate('calDate',1)">&#8250;</button>
         </div>
       </div>
-      <div class="field field-cals">
-        <label for="calInput">Calories</label>
-        <input type="number" id="calInput" placeholder="e.g. 1200">
-      </div>
-      <div class="add-btn-wrap">
-        <button class="add-btn" onclick="addEntry()">Add</button>
+      <div class="log-row-inputs">
+        <div class="field field-cals">
+          <label for="calInput">Calories</label>
+          <input type="number" id="calInput" placeholder="e.g. 1200">
+        </div>
+        <div class="add-btn-wrap" style="padding-top:23px">
+          <button class="add-btn" onclick="addEntry()">Add</button>
+        </div>
       </div>
     </div>
   </div>
@@ -550,15 +585,38 @@ var state = {
   weighIns: []
 };
 
-function formatDateNice(dateStr) {
-  if (!dateStr) return "Select date";
-  var parts = dateStr.split("-").map(Number);
-  return new Date(parts[0], parts[1]-1, parts[2]).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"});
+// Date navigation state
+var calDate = new Date();
+var wiDate = new Date();
+
+function dateToStr(d) {
+  return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate());
 }
 
-function updateDateDisplay(inputId, displayId) {
-  var val = document.getElementById(inputId).value;
-  document.getElementById(displayId).textContent = val ? formatDateNice(val) : "Select date";
+function strToDate(s) {
+  var p = s.split("-").map(Number);
+  return new Date(p[0], p[1]-1, p[2]);
+}
+
+function formatDateNice(d) {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var yesterday = new Date(today); yesterday.setDate(today.getDate()-1);
+  d.setHours(0,0,0,0);
+  if (d.getTime() === today.getTime()) return "Today";
+  if (d.getTime() === yesterday.getTime()) return "Yesterday";
+  var diff = Math.round((today - d) / 86400000);
+  if (diff > 0 && diff <= 6) return d.toLocaleDateString("en-US", {weekday:"short", month:"short", day:"numeric"});
+  return d.toLocaleDateString("en-US", {month:"short", day:"numeric"});
+}
+
+function shiftDate(which, delta) {
+  if (which === 'calDate') {
+    calDate.setDate(calDate.getDate() + delta);
+    document.getElementById("calDateLabel").textContent = formatDateNice(new Date(calDate));
+  } else {
+    wiDate.setDate(wiDate.getDate() + delta);
+    document.getElementById("wiDateLabel").textContent = formatDateNice(new Date(wiDate));
+  }
 }
 
 function save() {
@@ -730,7 +788,7 @@ function render() {
 }
 
 function addEntry() {
-  var dateVal = document.getElementById("dateInput").value;
+  var dateVal = dateToStr(calDate);
   var calVal = document.getElementById("calInput").value;
   var cals = parseInt(calVal);
   if (!dateVal || !calVal || isNaN(cals) || cals < 0) return;
@@ -756,7 +814,7 @@ function removeEntry(date) {
 }
 
 function addWeighIn() {
-  var dateVal = document.getElementById("wi_dateInput").value;
+  var dateVal = dateToStr(wiDate);
   var weightVal = document.getElementById("wi_weightInput").value;
   var weight = parseFloat(weightVal);
   if (!dateVal || !weightVal || isNaN(weight) || weight <= 0) return;
@@ -797,11 +855,11 @@ function updateSettingsPreview() {
 function openSettings() {
   document.getElementById("s_startWeight").value = state.settings.startWeight;
   document.getElementById("s_startDate").value = state.settings.startDate;
-  document.getElementById("s_startDate_display").textContent = formatDateNice(state.settings.startDate);
+  document.getElementById("s_startDate_display").textContent = strToDate(state.settings.startDate).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"});
   document.getElementById("s_tdee").value = state.settings.tdee;
   document.getElementById("s_goalWeight").value = state.settings.goalWeight;
   document.getElementById("s_targetDate").value = state.settings.targetDate;
-  document.getElementById("s_targetDate_display").textContent = formatDateNice(state.settings.targetDate);
+  document.getElementById("s_targetDate_display").textContent = strToDate(state.settings.targetDate).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"});
   updateSettingsPreview();
   document.getElementById("overlay").classList.add("open");
 }
@@ -843,11 +901,10 @@ document.getElementById("wi_weightInput").addEventListener("keydown", function(e
 });
 
 load();
-var t = todayStr();
-document.getElementById("dateInput").value = t;
-document.getElementById("dateDisplay").textContent = formatDateNice(t);
-document.getElementById("wi_dateInput").value = t;
-document.getElementById("wi_dateDisplay").textContent = formatDateNice(t);
+calDate = new Date(); calDate.setHours(0,0,0,0);
+wiDate = new Date(); wiDate.setHours(0,0,0,0);
+document.getElementById("calDateLabel").textContent = "Today";
+document.getElementById("wiDateLabel").textContent = "Today";
 render();
 </script>
 
