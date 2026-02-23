@@ -454,6 +454,12 @@ border-bottom: 1px solid #f0ebe6;
 
 <div class="main">
 
+  <!-- Storage warning banner -->
+
+  <div id="storageBanner" style="display:none;background:#fde8e8;border:1.5px solid #e8b4b4;border-radius:10px;padding:14px 16px;margin-bottom:10px;font-size:14px;color:#7a1818;line-height:1.5;">
+    <strong>Data won't save between sessions.</strong> Your browser is blocking local storage — this often happens in Firefox private mode or with strict privacy settings. Try opening this page in Safari, or go to Firefox Settings &rarr; Data Management and make sure vanishstar.github.io is allowed.
+  </div>
+
   <!-- Projection card -->
 
   <div class="card projection-card">
@@ -722,7 +728,32 @@ function calcTDEE(weightLbs) {
 }
 
 function save() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+  try {
+    var data = JSON.stringify(state);
+    localStorage.setItem(STORAGE_KEY, data);
+    // Verify it actually wrote
+    var check = localStorage.getItem(STORAGE_KEY);
+    if (!check) showStorageWarning();
+  } catch(e) {
+    showStorageWarning();
+  }
+}
+
+var storageWarningShown = false;
+function showStorageWarning() {
+  if (storageWarningShown) return;
+  storageWarningShown = true;
+  var banner = document.getElementById("storageBanner");
+  if (banner) banner.style.display = "block";
+}
+
+function testStorage() {
+  try {
+    localStorage.setItem("__test__", "1");
+    var v = localStorage.getItem("__test__");
+    localStorage.removeItem("__test__");
+    return v === "1";
+  } catch(e) { return false; }
 }
 
 function load() {
@@ -1052,6 +1083,7 @@ document.getElementById("wi_weightInput").addEventListener("keydown", function(e
   if (e.key === "Enter") addWeighIn();
 });
 
+if (!testStorage()) showStorageWarning();
 load();
 calDate = new Date(); calDate.setHours(0,0,0,0);
 wiDate = new Date(); wiDate.setHours(0,0,0,0);
