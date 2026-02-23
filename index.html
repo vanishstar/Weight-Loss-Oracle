@@ -187,7 +187,33 @@ box-shadow: none;
 display: block;
 line-height: 1.4;
 }
-input[type=“date”] { width: 144px; min-width: 144px; }
+input[type=“date”] {
+position: absolute;
+inset: 0;
+opacity: 0;
+width: 100%;
+height: 100%;
+cursor: pointer;
+z-index: 2;
+}
+.date-display {
+position: relative;
+width: 144px;
+min-width: 144px;
+height: 50px;
+border: 1.5px solid #d4c8be;
+border-radius: 10px;
+background: #ffffff;
+display: flex;
+align-items: center;
+padding: 0 14px;
+font-size: 16px;
+color: #1a1614;
+font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
+cursor: pointer;
+flex-shrink: 0;
+}
+.date-display span { position: relative; z-index: 1; pointer-events: none; }
 input[type=“number”]::-webkit-inner-spin-button,
 input[type=“number”]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=“number”] { -moz-appearance: textfield; }
@@ -409,7 +435,10 @@ cursor: pointer;
     <div class="log-weight-row">
       <div class="field">
         <label for="wi_dateInput">Date</label>
-        <input type="date" id="wi_dateInput" style="width:144px;min-width:144px">
+        <div class="date-display">
+          <span id="wi_dateDisplay">Today</span>
+          <input type="date" id="wi_dateInput" oninput="updateDateDisplay('wi_dateInput','wi_dateDisplay')" onchange="updateDateDisplay('wi_dateInput','wi_dateDisplay')">
+        </div>
       </div>
       <div class="field" style="flex:1;min-width:0">
         <label for="wi_weightInput">Weight (lbs)</label>
@@ -426,7 +455,10 @@ cursor: pointer;
     <div class="log-row">
       <div class="field">
         <label for="dateInput">Date</label>
-        <input type="date" id="dateInput">
+        <div class="date-display">
+          <span id="dateDisplay">Today</span>
+          <input type="date" id="dateInput" oninput="updateDateDisplay('dateInput','dateDisplay')" onchange="updateDateDisplay('dateInput','dateDisplay')">
+        </div>
       </div>
       <div class="field field-cals">
         <label for="calInput">Calories</label>
@@ -462,7 +494,10 @@ cursor: pointer;
 </div>
 <div class="setting-field">
   <label for="s_startDate">Start date</label>
-  <input type="date" id="s_startDate">
+  <div class="date-display" style="width:100%">
+    <span id="s_startDate_display">Select date</span>
+    <input type="date" id="s_startDate" oninput="updateDateDisplay('s_startDate','s_startDate_display')" onchange="updateDateDisplay('s_startDate','s_startDate_display')">
+  </div>
 </div>
 <div class="setting-field">
   <label for="s_tdee">Maintenance calories (TDEE)</label>
@@ -478,7 +513,10 @@ cursor: pointer;
 </div>
 <div class="setting-field">
   <label for="s_targetDate">Target date</label>
-  <input type="date" id="s_targetDate">
+  <div class="date-display" style="width:100%">
+    <span id="s_targetDate_display">Select date</span>
+    <input type="date" id="s_targetDate" oninput="updateDateDisplay('s_targetDate','s_targetDate_display')" onchange="updateDateDisplay('s_targetDate','s_targetDate_display')">
+  </div>
 </div>
 
 <div class="calorie-target-preview" id="ctpPreview">
@@ -511,6 +549,17 @@ var state = {
   log: [],
   weighIns: []
 };
+
+function formatDateNice(dateStr) {
+  if (!dateStr) return "Select date";
+  var parts = dateStr.split("-").map(Number);
+  return new Date(parts[0], parts[1]-1, parts[2]).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"});
+}
+
+function updateDateDisplay(inputId, displayId) {
+  var val = document.getElementById(inputId).value;
+  document.getElementById(displayId).textContent = val ? formatDateNice(val) : "Select date";
+}
 
 function save() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
@@ -748,9 +797,11 @@ function updateSettingsPreview() {
 function openSettings() {
   document.getElementById("s_startWeight").value = state.settings.startWeight;
   document.getElementById("s_startDate").value = state.settings.startDate;
+  document.getElementById("s_startDate_display").textContent = formatDateNice(state.settings.startDate);
   document.getElementById("s_tdee").value = state.settings.tdee;
   document.getElementById("s_goalWeight").value = state.settings.goalWeight;
   document.getElementById("s_targetDate").value = state.settings.targetDate;
+  document.getElementById("s_targetDate_display").textContent = formatDateNice(state.settings.targetDate);
   updateSettingsPreview();
   document.getElementById("overlay").classList.add("open");
 }
@@ -792,8 +843,11 @@ document.getElementById("wi_weightInput").addEventListener("keydown", function(e
 });
 
 load();
-document.getElementById("dateInput").value = todayStr();
-document.getElementById("wi_dateInput").value = todayStr();
+var t = todayStr();
+document.getElementById("dateInput").value = t;
+document.getElementById("dateDisplay").textContent = formatDateNice(t);
+document.getElementById("wi_dateInput").value = t;
+document.getElementById("wi_dateDisplay").textContent = formatDateNice(t);
 render();
 </script>
 
