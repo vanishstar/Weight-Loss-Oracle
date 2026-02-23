@@ -625,6 +625,18 @@ input::placeholder { color: #b0a099; }
 
     <input type="hidden" id="s_startDate_hidden">
     <input type="hidden" id="s_targetDate_hidden">
+    <div class="sheet-divider"></div>
+    <div class="sheet-section">Backup &amp; restore</div>
+    <div class="setting-field">
+      <label>Calorie log data</label>
+      <textarea id="importExportBox" rows="5" style="width:100%;padding:11px 14px;border:1.5px solid #d4c8be;border-radius:10px;font-size:14px;font-family:-apple-system,system-ui,sans-serif;color:#1a1614;background:#ffffff;resize:vertical;box-sizing:border-box;line-height:1.4;"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:20px">
+      <button class="toggle-btn" style="flex:1" onclick="exportData()">Export</button>
+      <button class="toggle-btn" style="flex:1" onclick="importData()">Import</button>
+    </div>
+    <p class="hint" style="margin-top:-12px">Export copies your log to the box above — then paste it into Notes for safekeeping. To restore, paste it back in and tap Import.</p>
+
     <div class="sheet-buttons">
       <button class="cancel-btn" onclick="closeSettings()">Cancel</button>
       <button class="save-btn" onclick="saveSettings()">Save</button>
@@ -641,7 +653,8 @@ var state = {
     startDate: todayStr(),
     tdee: 1750,
     goalWeight: 145,
-    targetDate: "2026-08-01"
+    targetDate: "2026-08-01",
+    activityLevel: "sedentary"
   },
   log: [],
   weighIns: []
@@ -1008,6 +1021,47 @@ function updateSettingsPreview() {
     document.getElementById("ctp_deficit").textContent = tc.deficitNeeded.toLocaleString() + " cal/day";
     document.getElementById("ctp_target").textContent = tc.calTarget.toLocaleString() + " cal/day";
   }
+}
+
+function exportData() {
+  var lines = state.log.map(function(e) { return e.date + "," + e.calories; });
+  document.getElementById("importExportBox").value = lines.join("\n");
+}
+
+function importData() {
+  var raw = document.getElementById("importExportBox").value.trim();
+  if (!raw) return;
+  var lines = raw.split("\n");
+  var imported = [];
+  var errors = 0;
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].trim();
+    if (!line) continue;
+    var parts = line.split(",");
+    if (parts.length !== 2) { errors++; continue; }
+    var date = parts[0].trim();
+    var cals = parseInt(parts[1].trim());
+    if (!date.match(/^\d{4}-\d{2}-\d{2}$/) || isNaN(cals) || cals < 0) { errors++; continue; }
+    imported.push({ date: date, calories: cals });
+  }
+  if (imported.length === 0) { alert("No valid entries found. Make sure you're pasting exported data."); return; }
+  // Merge with existing, imported wins on conflict
+  var merged = state.log.slice();
+  for (var j = 0; j < imported.length; j++) {
+    var found = false;
+    for (var k = 0; k < merged.length; k++) {
+      if (merged[k].date === imported[j].date) { merged[k] = imported[j]; found = true; break; }
+    }
+    if (!found) merged.push(imported[j]);
+  }
+  merged.sort(function(a,b) { return a.date.localeCompare(b.date); });
+  state.log = merged;
+  save();
+  render();
+  document.getElementById("importExportBox").value = "";
+  var msg = "Imported " + imported.length + " entries.";
+  if (errors > 0) msg += " " + errors + " lines skipped.";
+  alert(msg);
 }
 
 function setActivity(level) {
