@@ -417,6 +417,18 @@ cursor: pointer;
 -webkit-appearance: none;
 }
 .spacer { height: 20px; }
+.milestone-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 11px 0;
+border-bottom: 1px solid #f0ebe6;
+}
+.milestone-row:last-child { border-bottom: none; padding-bottom: 0; }
+.milestone-row:first-child { padding-top: 0; }
+.milestone-label { font-size: 15px; color: #3d3330; font-weight: 500; }
+.milestone-value { font-size: 17px; font-weight: 800; color: #1a1614; }
+.milestone-value.at-goal { color: #1e5c38; }
 </style>
 
 </head>
@@ -538,6 +550,13 @@ cursor: pointer;
   <div class="card" id="historyCard" style="display:none">
     <div class="card-label" id="historyLabel">Calorie History</div>
     <div class="history-scroll" id="historyList"></div>
+  </div>
+
+  <!-- Milestone card -->
+
+  <div class="card" id="milestoneCard" style="display:none">
+    <div class="card-label">At this pace&hellip;</div>
+    <div id="milestoneList"></div>
   </div>
 
   <div class="spacer"></div>
@@ -788,6 +807,30 @@ function render() {
   }
 
   // Calorie history
+  // Milestones
+  var milestoneCard = document.getElementById("milestoneCard");
+  var milestoneList = document.getElementById("milestoneList");
+  if (avgDeficit !== null) {
+    milestoneCard.style.display = "block";
+    var months = [1, 2, 3, 4, 5, 6];
+    var html = "";
+    for (var m = 0; m < months.length; m++) {
+      var days = Math.round(months[m] * 30.44);
+      var proj = state.settings.startWeight - (avgDeficit * (daysBetween(startDateObj, today) + days)) / 3500;
+      proj = Math.round(proj * 10) / 10;
+      var label = months[m] === 1 ? "1 month" : months[m] + " months";
+      var atGoal = proj <= state.settings.goalWeight;
+      html += '<div class="milestone-row">'
+        + '<span class="milestone-label">' + label + '</span>'
+        + '<span class="milestone-value' + (atGoal ? ' at-goal' : '') + '">'
+        + proj.toFixed(1) + ' lbs' + (atGoal ? ' ✓' : '') + '</span>'
+        + '</div>';
+    }
+    milestoneList.innerHTML = html;
+  } else {
+    milestoneCard.style.display = "none";
+  }
+
   var historyCard = document.getElementById("historyCard");
   var historyList = document.getElementById("historyList");
   if (hasLog) {
