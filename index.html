@@ -654,7 +654,8 @@ var state = {
     tdee: 1750,
     goalWeight: 145,
     targetDate: "2026-08-01",
-    activityLevel: "sedentary"
+    activityLevel: "sedentary",
+    tdeeOverride: 0
   },
   log: [],
   weighIns: []
@@ -723,8 +724,15 @@ function calcTDEE(weightLbs) {
   // Mifflin-St Jeor for Erin's stats: 30yo, 5'4" (162.6cm)
   var kg = weightLbs * 0.453592;
   var bmr = (10 * kg) + (6.25 * 162.6) - (5 * 30) - 161;
-  var multiplier = state.settings.activityLevel === "lightly_active" ? 1.375 : 1.2;
+  var multiplier = state.settings.activityLevel === "lightly_active" ? 1.26 : 1.2;
   return Math.round(bmr * multiplier);
+}
+
+function getEffectiveTDEE(weightLbs) {
+  // If user has set a manual override (non-zero), use it; otherwise use calculated
+  return (state.settings.tdeeOverride && state.settings.tdeeOverride > 0)
+    ? state.settings.tdeeOverride
+    : calcTDEE(weightLbs);
 }
 
 function save() {
@@ -768,6 +776,7 @@ function load() {
       if (!state.settings.goalWeight) state.settings.goalWeight = 145;
       if (!state.settings.targetDate) state.settings.targetDate = "2026-08-01";
       if (!state.settings.activityLevel) state.settings.activityLevel = "sedentary";
+      if (state.settings.tdeeOverride === undefined) state.settings.tdeeOverride = 0;
     }
     if (parsed.log) state.log = parsed.log;
     if (parsed.weighIns) state.weighIns = parsed.weighIns;
@@ -829,14 +838,14 @@ function render() {
   var currentWeightForTDEE = state.weighIns.length > 0
     ? state.weighIns[state.weighIns.length - 1].weight
     : state.settings.startWeight;
-  var dynamicTDEE = calcTDEE(currentWeightForTDEE);
+  var dynamicTDEE = getEffectiveTDEE(currentWeightForTDEE);
 
   if (hasLog) {
     var sum = 0;
     for (var i = 0; i < state.log.length; i++) sum += state.log[i].calories;
     avgCalories = Math.round(sum / state.log.length);
     avgDeficit = dynamicTDEE - avgCalories;
-    projectedWeight = state.settings.startWeight - (avgDeficit * totalDays) / 3500;
+    projectedWeight = currentWeightForTDEE - (avgDeficit * daysToTarget) / 3500;
   }
 
   // Projection number
@@ -876,7 +885,7 @@ function render() {
   if (state.weighIns.length > 0) {
     currentWeightForTarget = state.weighIns[state.weighIns.length - 1].weight;
   }
-  var tc = calcTarget(currentWeightForTarget, state.settings.goalWeight, calcTDEE(currentWeightForTarget), state.settings.targetDate);
+  var tc = calcTarget(currentWeightForTarget, state.settings.goalWeight, getEffectiveTDEE(currentWeightForTarget), state.settings.targetDate);
   if (tc) {
     document.getElementById("t_goal").textContent = state.settings.goalWeight + " lbs";
     document.getElementById("t_tolose").textContent = tc.toLose.toFixed(1) + " lbs";
@@ -908,14 +917,14 @@ function render() {
     milestoneCard.style.display = "block";
     var months = [1, 2, 3, 4, 5, 6];
     var html = "";
+    var baseWeight = state.weighIns.length > 0
+      ? state.weighIns[state.weighIns.length - 1].weight
+      : state.settings.startWeight;
     for (var m = 0; m < months.length; m++) {
       var days = Math.round(months[m] * 30.44);
-      // Use projected weight at that point to get a more accurate TDEE
-      var daysElapsed = daysBetween(startDateObj, today);
-      var projWeight = state.settings.startWeight - (avgDeficit * daysElapsed) / 3500;
-      var milestoneTDEE = calcTDEE(projWeight);
+      var milestoneTDEE = getEffectiveTDEE(baseWeight);
       var milestoneDeficit = milestoneTDEE - avgCalories;
-      var proj = projWeight - (milestoneDeficit * days) / 3500;
+      var proj = baseWeight - (milestoneDeficit * days) / 3500;
       proj = Math.round(proj * 10) / 10;
       var label = months[m] === 1 ? "1 month" : months[m] + " months";
       var atGoal = proj <= state.settings.goalWeight;
@@ -939,7 +948,19 @@ function render() {
     var html = "";
     for (var j = 0; j < sorted.length; j++) {
       var entry = sorted[j];
-      var deficit = state.settings.tdee - entry.calories;
+      // Find closest weigh-in to this entry's date for more accurate TDEE
+      var entryWeight = state.settings.startWeight;
+      if (state.weighIns.length > 0) {
+        var entryDate = strToDate(entry.date).getTime();
+        var closestIdx = 0;
+        var closestDist = Math.abs(strToDate(state.weighIns[0].date).getTime() - entryDate);
+        for (var wi = 1; wi < state.weighIns.length; wi++) {
+          var dist = Math.abs(strToDate(state.weighIns[wi].date).getTime() - entryDate);
+          if (dist < closestDist) { closestDist = dist; closestIdx = wi; }
+        }
+        entryWeight = state.weighIns[closestIdx].weight;
+      }
+      var deficit = getEffectiveTDEE(entryWeight) - entry.calories;
       var isDeficit = deficit >= 0;
       var bc = isDeficit ? "#1e5c38" : "#7a1818";
       var bb = isDeficit ? "#e6f4ec" : "#fde8e8";
@@ -1007,14 +1028,15 @@ function addWeighIn() {
 function updateSettingsPreview() {
   var sw = parseFloat(document.getElementById("s_startWeight").value) || state.settings.startWeight;
   var goal = parseFloat(document.getElementById("s_goalWeight").value) || state.settings.goalWeight;
-  var tdee = parseInt(document.getElementById("s_tdee").value) || state.settings.tdee;
+  var tdeeRaw = document.getElementById("s_tdee").value.trim();
+  var tdee = tdeeRaw ? parseInt(tdeeRaw) : calcTDEE(parseFloat(document.getElementById("s_startWeight").value) || state.settings.startWeight);
   var targetDate = document.getElementById("s_targetDate_hidden").value || state.settings.targetDate;
 
   // Use latest weigh-in weight if available
   var currentW = sw;
   if (state.weighIns.length > 0) currentW = state.weighIns[state.weighIns.length - 1].weight;
 
-  var tc = calcTarget(currentW, goal, calcTDEE(currentW), targetDate);
+  var tc = calcTarget(currentW, goal, getEffectiveTDEE(currentW), targetDate);
   if (tc) {
     document.getElementById("ctp_lose").textContent = tc.toLose.toFixed(1) + " lbs";
     document.getElementById("ctp_days").textContent = tc.days;
@@ -1081,7 +1103,10 @@ function openSettings() {
   document.getElementById("s_targetDate_hidden").value = state.settings.targetDate;
   document.getElementById("s_startWeight").value = state.settings.startWeight;
 
-  document.getElementById("s_tdee").value = state.settings.tdee;
+  var calcedTDEE = calcTDEE(state.weighIns.length > 0 ? state.weighIns[state.weighIns.length-1].weight : state.settings.startWeight);
+  var tdeeField = document.getElementById("s_tdee");
+  tdeeField.placeholder = calcedTDEE + " (calculated)";
+  tdeeField.value = state.settings.tdeeOverride > 0 ? state.settings.tdeeOverride : "";
   document.getElementById("s_goalWeight").value = state.settings.goalWeight;
 
   updateSettingsPreview();
@@ -1105,7 +1130,8 @@ function saveSettings() {
   // activityLevel saved live via setActivity(), no extra step needed
   if (!isNaN(sw)) state.settings.startWeight = sw;
   if (sd) state.settings.startDate = sd;
-  if (!isNaN(tdee)) state.settings.tdee = tdee;
+  var tdeeInput = document.getElementById("s_tdee").value.trim();
+  state.settings.tdeeOverride = tdeeInput ? (parseInt(tdeeInput) || 0) : 0;
   if (!isNaN(gw)) state.settings.goalWeight = gw;
   if (td) state.settings.targetDate = td;
   save();
