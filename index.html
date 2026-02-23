@@ -666,6 +666,13 @@ function shiftDate(which, delta) {
   }
 }
 
+function calcTDEE(weightLbs) {
+  // Mifflin-St Jeor for Erin's stats: 30yo, 5'4" (162.6cm), sedentary (x1.2)
+  var kg = weightLbs * 0.453592;
+  var bmr = (10 * kg) + (6.25 * 162.6) - (5 * 30) - 161;
+  return Math.round(bmr * 1.2);
+}
+
 function save() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
 }
@@ -737,11 +744,17 @@ function render() {
   var hasLog = state.log.length > 0;
   var avgCalories = null, avgDeficit = null, projectedWeight = null;
 
+  // Use current logged weight for TDEE, otherwise starting weight
+  var currentWeightForTDEE = state.weighIns.length > 0
+    ? state.weighIns[state.weighIns.length - 1].weight
+    : state.settings.startWeight;
+  var dynamicTDEE = calcTDEE(currentWeightForTDEE);
+
   if (hasLog) {
     var sum = 0;
     for (var i = 0; i < state.log.length; i++) sum += state.log[i].calories;
     avgCalories = Math.round(sum / state.log.length);
-    avgDeficit = state.settings.tdee - avgCalories;
+    avgDeficit = dynamicTDEE - avgCalories;
     projectedWeight = state.settings.startWeight - (avgDeficit * totalDays) / 3500;
   }
 
@@ -764,7 +777,7 @@ function render() {
     projStats.style.display = "block";
     emptyMsg.style.display = "none";
     document.getElementById("avgCal").textContent = avgCalories.toLocaleString();
-    document.getElementById("avgDef").textContent = avgDeficit > 0 ? "+" + avgDeficit : String(avgDeficit);
+    document.getElementById("avgDef").textContent = avgDeficit > 0 ? "+" + Math.round(avgDeficit) : String(Math.round(avgDeficit));
     document.getElementById("daysLeft").textContent = daysToTarget;
     var badge = document.getElementById("statusBadge");
     badge.style.background = bg;
@@ -782,7 +795,7 @@ function render() {
   if (state.weighIns.length > 0) {
     currentWeightForTarget = state.weighIns[state.weighIns.length - 1].weight;
   }
-  var tc = calcTarget(currentWeightForTarget, state.settings.goalWeight, state.settings.tdee, state.settings.targetDate);
+  var tc = calcTarget(currentWeightForTarget, state.settings.goalWeight, calcTDEE(currentWeightForTarget), state.settings.targetDate);
   if (tc) {
     document.getElementById("t_goal").textContent = state.settings.goalWeight + " lbs";
     document.getElementById("t_tolose").textContent = tc.toLose.toFixed(1) + " lbs";
@@ -816,7 +829,12 @@ function render() {
     var html = "";
     for (var m = 0; m < months.length; m++) {
       var days = Math.round(months[m] * 30.44);
-      var proj = state.settings.startWeight - (avgDeficit * (daysBetween(startDateObj, today) + days)) / 3500;
+      // Use projected weight at that point to get a more accurate TDEE
+      var daysElapsed = daysBetween(startDateObj, today);
+      var projWeight = state.settings.startWeight - (avgDeficit * daysElapsed) / 3500;
+      var milestoneTDEE = calcTDEE(projWeight);
+      var milestoneDeficit = milestoneTDEE - avgCalories;
+      var proj = projWeight - (milestoneDeficit * days) / 3500;
       proj = Math.round(proj * 10) / 10;
       var label = months[m] === 1 ? "1 month" : months[m] + " months";
       var atGoal = proj <= state.settings.goalWeight;
@@ -915,7 +933,7 @@ function updateSettingsPreview() {
   var currentW = sw;
   if (state.weighIns.length > 0) currentW = state.weighIns[state.weighIns.length - 1].weight;
 
-  var tc = calcTarget(currentW, goal, tdee, targetDate);
+  var tc = calcTarget(currentW, goal, calcTDEE(currentW), targetDate);
   if (tc) {
     document.getElementById("ctp_lose").textContent = tc.toLose.toFixed(1) + " lbs";
     document.getElementById("ctp_days").textContent = tc.days;
