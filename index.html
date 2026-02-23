@@ -777,7 +777,8 @@ function render() {
     var lost = state.settings.startWeight - latest.weight;
     document.getElementById("wi_current").textContent = latest.weight.toFixed(1) + " lbs";
     document.getElementById("wi_date").textContent = "as of " + formatDate(latest.date);
-    document.getElementById("wi_lost").textContent = (lost >= 0 ? "-" : "+") + Math.abs(lost).toFixed(1) + " lbs";
+    var lostRounded = Math.round(lost * 10) / 10;
+    document.getElementById("wi_lost").textContent = (lostRounded > 0 ? "-" : lostRounded < 0 ? "+" : "") + Math.abs(lostRounded).toFixed(1) + " lbs";
     document.getElementById("wi_start").textContent = "since " + formatDate(state.settings.startDate);
   } else {
     document.getElementById("wi_current").textContent = state.settings.startWeight + " lbs";
