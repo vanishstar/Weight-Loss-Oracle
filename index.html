@@ -73,6 +73,7 @@ text-transform: uppercase;
 margin-bottom: 14px;
 }
 
+/* PROJECTION CARD */
 .projection-card { text-align: center; }
 .projection-number {
 font-size: 68px;
@@ -117,19 +118,42 @@ line-height: 1.4;
 }
 .empty-msg { color: #6b5d57; font-size: 15px; }
 
-.current-row {
-background: #ffffff;
-border-radius: 12px;
-padding: 13px 18px;
-margin-bottom: 10px;
+/* WEIGH-IN CARD */
+.weighin-top {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+margin-bottom: 14px;
+}
+.weighin-stats { display: flex; gap: 24px; }
+.weighin-stat-value {
+font-size: 26px;
+font-weight: 800;
+color: #1a1614;
+letter-spacing: -0.5px;
+line-height: 1;
+margin-bottom: 3px;
+}
+.weighin-stat-label { font-size: 12px; font-weight: 600; color: #6b5d57; }
+.weighin-stat-sub { font-size: 12px; color: #6b5d57; margin-top: 2px; }
+.log-weight-row { display: flex; gap: 10px; align-items: flex-end; border-top: 1px solid #d4c8be; padding-top: 14px; }
+.log-weight-row .field { flex: 1; min-width: 0; }
+
+/* CALORIE TARGET CARD */
+.target-row {
 display: flex;
 justify-content: space-between;
 align-items: center;
-box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+padding: 10px 0;
+border-bottom: 1px solid #f0ebe6;
 }
-.current-label { font-size: 15px; color: #3d3330; font-weight: 500; }
-.current-value { font-size: 20px; font-weight: 800; color: #1a1614; }
+.target-row:last-child { border-bottom: none; padding-bottom: 0; }
+.target-row:first-child { padding-top: 0; }
+.target-label { font-size: 15px; color: #3d3330; font-weight: 500; }
+.target-value { font-size: 17px; font-weight: 800; color: #1a1614; }
+.target-value.highlight { color: #1e5c38; }
 
+/* LOG FORM */
 .log-row { display: flex; gap: 10px; align-items: flex-start; }
 .field { display: flex; flex-direction: column; }
 .field-cals { flex: 1; min-width: 0; }
@@ -142,7 +166,8 @@ margin-bottom: 6px;
 display: block;
 }
 input[type=“date”],
-input[type=“number”] {
+input[type=“number”],
+input[type=“text”] {
 padding: 11px 14px;
 border: 1.5px solid #d4c8be;
 border-radius: 8px;
@@ -157,7 +182,6 @@ width: 100%;
 appearance: none;
 }
 input[type=“date”] { width: 136px; }
-input[type=“number”] { width: 100%; }
 
 .add-btn-wrap { flex: 0 0 auto; padding-top: 23px; }
 .add-btn {
@@ -173,7 +197,22 @@ font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
 cursor: pointer;
 white-space: nowrap;
 }
+.add-btn-bottom {
+background: #2c2420;
+color: #ffffff;
+border: none;
+padding: 0 16px;
+font-size: 15px;
+font-weight: 700;
+border-radius: 8px;
+height: 46px;
+font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
+cursor: pointer;
+white-space: nowrap;
+flex: 0 0 auto;
+}
 
+/* HISTORY */
 .history-scroll {
 max-height: 280px;
 overflow-y: auto;
@@ -201,6 +240,7 @@ cursor: pointer;
 font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
 }
 
+/* SETTINGS SHEET */
 .overlay {
 position: fixed;
 inset: 0;
@@ -219,11 +259,37 @@ padding-bottom: calc(40px + env(safe-area-inset-bottom));
 width: 100%;
 max-width: 520px;
 box-shadow: 0 -4px 30px rgba(0,0,0,0.15);
+max-height: 90vh;
+overflow-y: auto;
 }
 .sheet-title { font-size: 20px; font-weight: 700; color: #1a1614; margin-bottom: 22px; }
+.sheet-section {
+font-size: 11px;
+font-weight: 700;
+letter-spacing: 1.5px;
+color: #6b5d57;
+text-transform: uppercase;
+margin-bottom: 12px;
+margin-top: 22px;
+}
+.sheet-section:first-of-type { margin-top: 0; }
 .setting-field { margin-bottom: 16px; }
 .setting-field input { width: 100%; }
-.hint { font-size: 14px; color: #6b5d57; margin-top: -8px; margin-bottom: 24px; line-height: 1.5; }
+.hint { font-size: 14px; color: #6b5d57; margin-top: -8px; margin-bottom: 16px; line-height: 1.5; }
+
+.sheet-divider { height: 1px; background: #d4c8be; margin: 20px 0; }
+
+.calorie-target-preview {
+background: #ffffff;
+border-radius: 10px;
+padding: 14px 16px;
+margin-bottom: 20px;
+}
+.ctp-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+.ctp-label { font-size: 14px; color: #3d3330; }
+.ctp-value { font-size: 15px; font-weight: 700; color: #1a1614; }
+.ctp-value.green { color: #1e5c38; }
+
 .sheet-buttons { display: flex; gap: 12px; }
 .cancel-btn {
 flex: 1;
@@ -257,7 +323,7 @@ cursor: pointer;
 
 <div class="header">
   <div>
-    <div class="header-sub">August Countdown</div>
+    <div class="header-sub" id="headerSub">August Countdown</div>
     <div class="header-title">Weight Projection</div>
   </div>
   <button class="settings-btn" onclick="openSettings()">Settings</button>
@@ -265,8 +331,10 @@ cursor: pointer;
 
 <div class="main">
 
+  <!-- Projection card -->
+
   <div class="card projection-card">
-    <div class="card-label">Projected Weight &middot; Aug 1st</div>
+    <div class="card-label" id="projCardLabel">Projected Weight &middot; Aug 1st</div>
     <div class="projection-number" id="projNum">&#8212;</div>
     <div class="projection-unit">lbs</div>
     <div id="projStats" style="display:none">
@@ -280,10 +348,60 @@ cursor: pointer;
     <div class="empty-msg" id="emptyMsg">Log your first day below to see your projection.</div>
   </div>
 
-  <div class="current-row" id="currentRow" style="display:none">
-    <span class="current-label">Est. current weight</span>
-    <span class="current-value" id="currentVal">&#8212;</span>
+  <!-- Calorie target card -->
+
+  <div class="card" id="targetCard">
+    <div class="card-label">To reach your goal</div>
+    <div class="target-row">
+      <span class="target-label">Goal weight</span>
+      <span class="target-value" id="t_goal">&#8212;</span>
+    </div>
+    <div class="target-row">
+      <span class="target-label">Lbs to lose</span>
+      <span class="target-value" id="t_tolose">&#8212;</span>
+    </div>
+    <div class="target-row">
+      <span class="target-label">Required daily deficit</span>
+      <span class="target-value" id="t_deficit">&#8212;</span>
+    </div>
+    <div class="target-row">
+      <span class="target-label">Daily calorie target</span>
+      <span class="target-value highlight" id="t_caltarget">&#8212;</span>
+    </div>
   </div>
+
+  <!-- Weigh-in card -->
+
+  <div class="card">
+    <div class="card-label">Weight Log</div>
+    <div class="weighin-top">
+      <div class="weighin-stats">
+        <div>
+          <div class="weighin-stat-value" id="wi_current">&#8212;</div>
+          <div class="weighin-stat-label">Current weight</div>
+          <div class="weighin-stat-sub" id="wi_date"></div>
+        </div>
+        <div>
+          <div class="weighin-stat-value" id="wi_lost" style="color:#1e5c38">&#8212;</div>
+          <div class="weighin-stat-label">Total lost</div>
+          <div class="weighin-stat-sub" id="wi_start"></div>
+        </div>
+      </div>
+    </div>
+    <div class="log-weight-row">
+      <div class="field">
+        <label for="wi_dateInput">Date</label>
+        <input type="date" id="wi_dateInput" style="width:136px">
+      </div>
+      <div class="field" style="flex:1;min-width:0">
+        <label for="wi_weightInput">Weight (lbs)</label>
+        <input type="number" id="wi_weightInput" placeholder="e.g. 165.2" step="0.1">
+      </div>
+      <button class="add-btn-bottom" onclick="addWeighIn()">Log</button>
+    </div>
+  </div>
+
+  <!-- Calorie log form -->
 
   <div class="card">
     <div class="card-label">Log a Day</div>
@@ -302,44 +420,78 @@ cursor: pointer;
     </div>
   </div>
 
+  <!-- Calorie history -->
+
   <div class="card" id="historyCard" style="display:none">
-    <div class="card-label" id="historyLabel">History</div>
+    <div class="card-label" id="historyLabel">Calorie History</div>
     <div class="history-scroll" id="historyList"></div>
   </div>
 
   <div class="spacer"></div>
 </div>
 
+<!-- Settings sheet -->
+
 <div class="overlay" id="overlay" onclick="overlayClick(event)">
   <div class="sheet">
     <div class="sheet-title">Settings</div>
-    <div class="setting-field">
-      <label for="s_startWeight">Starting weight (lbs)</label>
-      <input type="number" id="s_startWeight" step="0.1">
-    </div>
-    <div class="setting-field">
-      <label for="s_startDate">Start date</label>
-      <input type="date" id="s_startDate">
-    </div>
-    <div class="setting-field">
-      <label for="s_tdee">Maintenance calories (TDEE)</label>
-      <input type="number" id="s_tdee">
-    </div>
-    <p class="hint">Calories to maintain your current weight. Based on your stats, yours is about 1,750.</p>
-    <div class="sheet-buttons">
-      <button class="cancel-btn" onclick="closeSettings()">Cancel</button>
-      <button class="save-btn" onclick="saveSettings()">Save</button>
-    </div>
+
+```
+<div class="sheet-section">Starting point</div>
+<div class="setting-field">
+  <label for="s_startWeight">Starting weight (lbs)</label>
+  <input type="number" id="s_startWeight" step="0.1">
+</div>
+<div class="setting-field">
+  <label for="s_startDate">Start date</label>
+  <input type="date" id="s_startDate">
+</div>
+<div class="setting-field">
+  <label for="s_tdee">Maintenance calories (TDEE)</label>
+  <input type="number" id="s_tdee">
+</div>
+<p class="hint">Based on your stats, yours is about 1,750.</p>
+
+<div class="sheet-divider"></div>
+<div class="sheet-section">Goal</div>
+<div class="setting-field">
+  <label for="s_goalWeight">Goal weight (lbs)</label>
+  <input type="number" id="s_goalWeight" step="0.1">
+</div>
+<div class="setting-field">
+  <label for="s_targetDate">Target date</label>
+  <input type="date" id="s_targetDate">
+</div>
+
+<div class="calorie-target-preview" id="ctpPreview">
+  <div class="ctp-row"><span class="ctp-label">Lbs to lose</span><span class="ctp-value" id="ctp_lose">&#8212;</span></div>
+  <div class="ctp-row"><span class="ctp-label">Days until target</span><span class="ctp-value" id="ctp_days">&#8212;</span></div>
+  <div class="ctp-row"><span class="ctp-label">Required daily deficit</span><span class="ctp-value" id="ctp_deficit">&#8212;</span></div>
+  <div class="ctp-row"><span class="ctp-label">Daily calorie target</span><span class="ctp-value green" id="ctp_target">&#8212;</span></div>
+</div>
+
+<div class="sheet-buttons">
+  <button class="cancel-btn" onclick="closeSettings()">Cancel</button>
+  <button class="save-btn" onclick="saveSettings()">Save</button>
+</div>
+```
+
   </div>
 </div>
 
 <script>
 var STORAGE_KEY = "wl-tracker-v2";
-var AUG1 = new Date("2026-08-01T00:00:00");
 
 var state = {
-  settings: { startWeight: 166.6, startDate: todayStr(), tdee: 1750 },
-  log: []
+  settings: {
+    startWeight: 166.6,
+    startDate: todayStr(),
+    tdee: 1750,
+    goalWeight: 145,
+    targetDate: "2026-08-01"
+  },
+  log: [],
+  weighIns: []
 };
 
 function save() {
@@ -351,8 +503,13 @@ function load() {
     var raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       var parsed = JSON.parse(raw);
-      if (parsed.settings) state.settings = parsed.settings;
+      if (parsed.settings) {
+        state.settings = parsed.settings;
+        if (!state.settings.goalWeight) state.settings.goalWeight = 145;
+        if (!state.settings.targetDate) state.settings.targetDate = "2026-08-01";
+      }
       if (parsed.log) state.log = parsed.log;
+      if (parsed.weighIns) state.weighIns = parsed.weighIns;
     }
   } catch(e) {}
 }
@@ -373,15 +530,40 @@ function formatDate(dateStr) {
   return new Date(parts[0], parts[1]-1, parts[2]).toLocaleDateString("en-US", {month:"short", day:"numeric"});
 }
 
+function formatDateLong(dateStr) {
+  var parts = dateStr.split("-").map(Number);
+  return new Date(parts[0], parts[1]-1, parts[2]).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"});
+}
+
+function calcTarget(startWeight, goalWeight, tdee, targetDate) {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var target = new Date(targetDate + "T00:00:00");
+  var days = daysBetween(today, target);
+  if (days <= 0) return null;
+  var toLose = startWeight - goalWeight;
+  var deficitNeeded = (toLose * 3500) / days;
+  var calTarget = Math.round(tdee - deficitNeeded);
+  return {
+    days: days,
+    toLose: toLose,
+    deficitNeeded: Math.round(deficitNeeded),
+    calTarget: calTarget
+  };
+}
+
 function render() {
   var today = new Date(); today.setHours(0,0,0,0);
-  var daysToAug1 = daysBetween(today, AUG1);
+  var targetDateObj = new Date(state.settings.targetDate + "T00:00:00");
+  var daysToTarget = daysBetween(today, targetDateObj);
   var startDateObj = new Date(state.settings.startDate + "T00:00:00");
-  var totalDays = daysBetween(startDateObj, AUG1);
-  var daysSinceStart = daysBetween(startDateObj, today);
+  var totalDays = daysBetween(startDateObj, targetDateObj);
+
+  // Update header and projection label
+  document.getElementById("headerSub").textContent = formatDateLong(state.settings.targetDate) + " Countdown";
+  document.getElementById("projCardLabel").textContent = "Projected Weight \u00b7 " + formatDate(state.settings.targetDate);
 
   var hasLog = state.log.length > 0;
-  var avgCalories = null, avgDeficit = null, projectedWeight = null, currentEstimate = null;
+  var avgCalories = null, avgDeficit = null, projectedWeight = null;
 
   if (hasLog) {
     var sum = 0;
@@ -389,53 +571,74 @@ function render() {
     avgCalories = Math.round(sum / state.log.length);
     avgDeficit = state.settings.tdee - avgCalories;
     projectedWeight = state.settings.startWeight - (avgDeficit * totalDays) / 3500;
-    currentEstimate = state.settings.startWeight - (avgDeficit * daysSinceStart) / 3500;
   }
 
+  // Projection number
   var projNum = document.getElementById("projNum");
   projNum.textContent = projectedWeight !== null ? projectedWeight.toFixed(1) : "\u2014";
 
+  var goal = state.settings.goalWeight;
   var color = "#6b5d57", bg = "#f5f2ee";
   if (projectedWeight !== null) {
-    if (projectedWeight <= 145)      { color = "#1e5c38"; bg = "#e6f4ec"; }
-    else if (projectedWeight <= 150) { color = "#7a4800"; bg = "#fff3e0"; }
-    else                             { color = "#7a1818"; bg = "#fde8e8"; }
+    if (projectedWeight <= goal)        { color = "#1e5c38"; bg = "#e6f4ec"; }
+    else if (projectedWeight <= goal+5) { color = "#7a4800"; bg = "#fff3e0"; }
+    else                                { color = "#7a1818"; bg = "#fde8e8"; }
   }
   projNum.style.color = color;
 
   var projStats = document.getElementById("projStats");
   var emptyMsg = document.getElementById("emptyMsg");
-
   if (hasLog) {
     projStats.style.display = "block";
     emptyMsg.style.display = "none";
     document.getElementById("avgCal").textContent = avgCalories.toLocaleString();
     document.getElementById("avgDef").textContent = avgDeficit > 0 ? "+" + avgDeficit : String(avgDeficit);
-    document.getElementById("daysLeft").textContent = daysToAug1;
+    document.getElementById("daysLeft").textContent = daysToTarget;
     var badge = document.getElementById("statusBadge");
     badge.style.background = bg;
     badge.style.color = color;
-    badge.textContent = projectedWeight <= 145
-      ? "\u2713 On track for your goal of 140\u2013145 lbs"
-      : (projectedWeight - 145).toFixed(1) + " lbs above goal range";
+    badge.textContent = projectedWeight <= goal
+      ? "\u2713 On track for your goal of " + goal + " lbs"
+      : (projectedWeight - goal).toFixed(1) + " lbs above goal";
   } else {
     projStats.style.display = "none";
     emptyMsg.style.display = "block";
   }
 
-  var currentRow = document.getElementById("currentRow");
-  if (currentEstimate !== null) {
-    currentRow.style.display = "flex";
-    document.getElementById("currentVal").textContent = currentEstimate.toFixed(1) + " lbs";
-  } else {
-    currentRow.style.display = "none";
+  // Calorie target card — uses current weight from weigh-ins if available
+  var currentWeightForTarget = state.settings.startWeight;
+  if (state.weighIns.length > 0) {
+    currentWeightForTarget = state.weighIns[state.weighIns.length - 1].weight;
+  }
+  var tc = calcTarget(currentWeightForTarget, state.settings.goalWeight, state.settings.tdee, state.settings.targetDate);
+  if (tc) {
+    document.getElementById("t_goal").textContent = state.settings.goalWeight + " lbs";
+    document.getElementById("t_tolose").textContent = tc.toLose.toFixed(1) + " lbs";
+    document.getElementById("t_deficit").textContent = tc.deficitNeeded.toLocaleString() + " cal/day";
+    document.getElementById("t_caltarget").textContent = tc.calTarget.toLocaleString() + " cal/day";
   }
 
+  // Weigh-in card
+  if (state.weighIns.length > 0) {
+    var latest = state.weighIns[state.weighIns.length - 1];
+    var lost = state.settings.startWeight - latest.weight;
+    document.getElementById("wi_current").textContent = latest.weight.toFixed(1) + " lbs";
+    document.getElementById("wi_date").textContent = "as of " + formatDate(latest.date);
+    document.getElementById("wi_lost").textContent = (lost >= 0 ? "-" : "+") + Math.abs(lost).toFixed(1) + " lbs";
+    document.getElementById("wi_start").textContent = "since " + formatDate(state.settings.startDate);
+  } else {
+    document.getElementById("wi_current").textContent = state.settings.startWeight + " lbs";
+    document.getElementById("wi_date").textContent = "starting weight";
+    document.getElementById("wi_lost").textContent = "0 lbs";
+    document.getElementById("wi_start").textContent = "nothing logged yet";
+  }
+
+  // Calorie history
   var historyCard = document.getElementById("historyCard");
   var historyList = document.getElementById("historyList");
   if (hasLog) {
     historyCard.style.display = "block";
-    document.getElementById("historyLabel").textContent = "History \u00b7 " + state.log.length + (state.log.length === 1 ? " day" : " days");
+    document.getElementById("historyLabel").textContent = "Calorie History \u00b7 " + state.log.length + (state.log.length === 1 ? " day" : " days");
     var sorted = state.log.slice().reverse();
     var html = "";
     for (var j = 0; j < sorted.length; j++) {
@@ -485,10 +688,52 @@ function removeEntry(date) {
   render();
 }
 
+function addWeighIn() {
+  var dateVal = document.getElementById("wi_dateInput").value;
+  var weightVal = document.getElementById("wi_weightInput").value;
+  var weight = parseFloat(weightVal);
+  if (!dateVal || !weightVal || isNaN(weight) || weight <= 0) return;
+  var existing = -1;
+  for (var i = 0; i < state.weighIns.length; i++) {
+    if (state.weighIns[i].date === dateVal) { existing = i; break; }
+  }
+  if (existing >= 0) {
+    state.weighIns[existing] = { date: dateVal, weight: weight };
+  } else {
+    state.weighIns.push({ date: dateVal, weight: weight });
+    state.weighIns.sort(function(a,b) { return a.date.localeCompare(b.date); });
+  }
+  document.getElementById("wi_weightInput").value = "";
+  save();
+  render();
+}
+
+function updateSettingsPreview() {
+  var sw = parseFloat(document.getElementById("s_startWeight").value) || state.settings.startWeight;
+  var goal = parseFloat(document.getElementById("s_goalWeight").value) || state.settings.goalWeight;
+  var tdee = parseInt(document.getElementById("s_tdee").value) || state.settings.tdee;
+  var targetDate = document.getElementById("s_targetDate").value || state.settings.targetDate;
+
+  // Use latest weigh-in weight if available
+  var currentW = sw;
+  if (state.weighIns.length > 0) currentW = state.weighIns[state.weighIns.length - 1].weight;
+
+  var tc = calcTarget(currentW, goal, tdee, targetDate);
+  if (tc) {
+    document.getElementById("ctp_lose").textContent = tc.toLose.toFixed(1) + " lbs";
+    document.getElementById("ctp_days").textContent = tc.days;
+    document.getElementById("ctp_deficit").textContent = tc.deficitNeeded.toLocaleString() + " cal/day";
+    document.getElementById("ctp_target").textContent = tc.calTarget.toLocaleString() + " cal/day";
+  }
+}
+
 function openSettings() {
   document.getElementById("s_startWeight").value = state.settings.startWeight;
   document.getElementById("s_startDate").value = state.settings.startDate;
   document.getElementById("s_tdee").value = state.settings.tdee;
+  document.getElementById("s_goalWeight").value = state.settings.goalWeight;
+  document.getElementById("s_targetDate").value = state.settings.targetDate;
+  updateSettingsPreview();
   document.getElementById("overlay").classList.add("open");
 }
 
@@ -504,20 +749,33 @@ function saveSettings() {
   var sw = parseFloat(document.getElementById("s_startWeight").value);
   var sd = document.getElementById("s_startDate").value;
   var tdee = parseInt(document.getElementById("s_tdee").value);
+  var gw = parseFloat(document.getElementById("s_goalWeight").value);
+  var td = document.getElementById("s_targetDate").value;
   if (!isNaN(sw)) state.settings.startWeight = sw;
   if (sd) state.settings.startDate = sd;
   if (!isNaN(tdee)) state.settings.tdee = tdee;
+  if (!isNaN(gw)) state.settings.goalWeight = gw;
+  if (td) state.settings.targetDate = td;
   save();
   closeSettings();
   render();
 }
 
+// Live preview in settings
+["s_startWeight","s_goalWeight","s_tdee","s_targetDate"].forEach(function(id) {
+  document.getElementById(id).addEventListener("input", updateSettingsPreview);
+});
+
 document.getElementById("calInput").addEventListener("keydown", function(e) {
   if (e.key === "Enter") addEntry();
+});
+document.getElementById("wi_weightInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") addWeighIn();
 });
 
 load();
 document.getElementById("dateInput").value = todayStr();
+document.getElementById("wi_dateInput").value = todayStr();
 render();
 </script>
 
