@@ -170,20 +170,30 @@ input[type=“number”],
 input[type=“text”] {
 padding: 11px 14px;
 border: 1.5px solid #d4c8be;
-border-radius: 8px;
+border-radius: 10px;
+-webkit-border-radius: 10px;
 font-size: 16px;
 background: #ffffff;
 color: #1a1614;
 outline: none;
-height: 46px;
+height: 50px;
 font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
 width: 100%;
 -webkit-appearance: none;
+-moz-appearance: none;
 appearance: none;
+box-shadow: none;
+-webkit-box-shadow: none;
+display: block;
+line-height: 1.4;
 }
-input[type=“date”] { width: 136px; }
+input[type=“date”] { width: 144px; min-width: 144px; }
+input[type=“number”]::-webkit-inner-spin-button,
+input[type=“number”]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=“number”] { -moz-appearance: textfield; }
+input::placeholder { color: #b0a099; }
 
-.add-btn-wrap { flex: 0 0 auto; padding-top: 23px; }
+.add-btn-wrap { flex: 0 0 auto; padding-top: 25px; }
 .add-btn {
 background: #2c2420;
 color: #ffffff;
@@ -191,11 +201,13 @@ border: none;
 padding: 0 16px;
 font-size: 15px;
 font-weight: 700;
-border-radius: 8px;
-height: 46px;
+border-radius: 10px;
+-webkit-border-radius: 10px;
+height: 50px;
 font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
 cursor: pointer;
 white-space: nowrap;
+-webkit-appearance: none;
 }
 .add-btn-bottom {
 background: #2c2420;
@@ -204,12 +216,14 @@ border: none;
 padding: 0 16px;
 font-size: 15px;
 font-weight: 700;
-border-radius: 8px;
-height: 46px;
+border-radius: 10px;
+-webkit-border-radius: 10px;
+height: 50px;
 font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
 cursor: pointer;
 white-space: nowrap;
 flex: 0 0 auto;
+-webkit-appearance: none;
 }
 
 /* HISTORY */
@@ -298,10 +312,12 @@ border: 1.5px solid #d4c8be;
 color: #3d3330;
 padding: 14px;
 border-radius: 10px;
+-webkit-border-radius: 10px;
 font-size: 16px;
 font-weight: 600;
 font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
 cursor: pointer;
+-webkit-appearance: none;
 }
 .save-btn {
 flex: 1;
@@ -310,10 +326,12 @@ color: #ffffff;
 border: none;
 padding: 14px;
 border-radius: 10px;
+-webkit-border-radius: 10px;
 font-size: 16px;
 font-weight: 600;
 font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
 cursor: pointer;
+-webkit-appearance: none;
 }
 .spacer { height: 20px; }
 </style>
@@ -391,7 +409,7 @@ cursor: pointer;
     <div class="log-weight-row">
       <div class="field">
         <label for="wi_dateInput">Date</label>
-        <input type="date" id="wi_dateInput" style="width:136px">
+        <input type="date" id="wi_dateInput" style="width:144px;min-width:144px">
       </div>
       <div class="field" style="flex:1;min-width:0">
         <label for="wi_weightInput">Weight (lbs)</label>
