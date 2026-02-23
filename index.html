@@ -373,6 +373,16 @@ margin-top: 22px;
 .setting-field { margin-bottom: 16px; }
 .setting-field input { width: 100%; }
 .hint { font-size: 14px; color: #6b5d57; margin-top: -8px; margin-bottom: 16px; line-height: 1.5; }
+.toggle-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.toggle-btn {
+flex: 1; padding: 11px 8px; border: 1.5px solid #d4c8be;
+border-radius: 10px; background: #ffffff; color: #6b5d57;
+font-size: 15px; font-weight: 600; font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
+cursor: pointer; -webkit-appearance: none;
+}
+.toggle-btn-active {
+background: #2c2420; color: #ffffff; border-color: #2c2420;
+}
 
 .sheet-divider { height: 1px; background: #d4c8be; margin: 20px 0; }
 
@@ -575,17 +585,26 @@ border-bottom: 1px solid #f0ebe6;
   <div class="input-wrap"><input type="number" id="s_startWeight" step="0.1"></div>
 </div>
 <div class="setting-field">
-  <label for="s_startDate">Start date</label>
-  <div class="date-display" style="width:100%">
-    <span id="s_startDate_display">Select date</span>
-    <input type="date" id="s_startDate" oninput="updateDateDisplay('s_startDate','s_startDate_display')" onchange="updateDateDisplay('s_startDate','s_startDate_display')">
+  <label>Start date</label>
+  <div class="date-nav">
+    <button class="date-nav-arrow" onclick="shiftSettingsDate('startDate',-1)">&#8249;</button>
+    <div class="date-nav-label" id="s_startDate_display">Select date</div>
+    <button class="date-nav-arrow" onclick="shiftSettingsDate('startDate',1)">&#8250;</button>
   </div>
 </div>
 <div class="setting-field">
   <label for="s_tdee">Maintenance calories (TDEE)</label>
   <div class="input-wrap"><input type="number" id="s_tdee"></div>
 </div>
-<p class="hint">Based on your stats, yours is about 1,750.</p>
+<p class="hint">This is calculated automatically from your weight — the number above is just for reference.</p>
+<div class="setting-field">
+  <label>Activity level</label>
+  <div class="toggle-row">
+    <button id="btn_sedentary" class="toggle-btn toggle-btn-active" onclick="setActivity('sedentary')">Sedentary</button>
+    <button id="btn_lightly_active" class="toggle-btn" onclick="setActivity('lightly_active')">Lightly active</button>
+  </div>
+  <p class="hint" style="margin-top:8px">Sedentary = desk job, minimal exercise. Lightly active = 1&ndash;3 days/week of light activity.</p>
+</div>
 
 <div class="sheet-divider"></div>
 <div class="sheet-section">Goal</div>
@@ -594,10 +613,11 @@ border-bottom: 1px solid #f0ebe6;
   <div class="input-wrap"><input type="number" id="s_goalWeight" step="0.1"></div>
 </div>
 <div class="setting-field">
-  <label for="s_targetDate">Target date</label>
-  <div class="date-display" style="width:100%">
-    <span id="s_targetDate_display">Select date</span>
-    <input type="date" id="s_targetDate" oninput="updateDateDisplay('s_targetDate','s_targetDate_display')" onchange="updateDateDisplay('s_targetDate','s_targetDate_display')">
+  <label>Target date</label>
+  <div class="date-nav">
+    <button class="date-nav-arrow" onclick="shiftSettingsDate('targetDate',-1)">&#8249;</button>
+    <div class="date-nav-label" id="s_targetDate_display">Select date</div>
+    <button class="date-nav-arrow" onclick="shiftSettingsDate('targetDate',1)">&#8250;</button>
   </div>
 </div>
 
@@ -608,6 +628,8 @@ border-bottom: 1px solid #f0ebe6;
   <div class="ctp-row"><span class="ctp-label">Daily calorie target</span><span class="ctp-value green" id="ctp_target">&#8212;</span></div>
 </div>
 
+<input type="hidden" id="s_startDate_hidden">
+<input type="hidden" id="s_targetDate_hidden">
 <div class="sheet-buttons">
   <button class="cancel-btn" onclick="closeSettings()">Cancel</button>
   <button class="save-btn" onclick="saveSettings()">Save</button>
@@ -635,6 +657,8 @@ var state = {
 // Date navigation state
 var calDate = new Date();
 var wiDate = new Date();
+var settingsStartDate = todayStr();
+var settingsTargetDate = "2026-08-01";
 
 function dateToStr(d) {
   return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate());
@@ -656,6 +680,29 @@ function formatDateNice(d) {
   return d.toLocaleDateString("en-US", {month:"short", day:"numeric"});
 }
 
+function settingsDateToDate(which) {
+  var str = which === 'startDate' ? settingsStartDate : settingsTargetDate;
+  return strToDate(str);
+}
+
+function shiftSettingsDate(which, delta) {
+  var d = which === 'startDate' ? strToDate(settingsStartDate) : strToDate(settingsTargetDate);
+  d.setDate(d.getDate() + delta);
+  var str = dateToStr(d);
+  var label = d.toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"});
+  if (which === 'startDate') {
+    settingsStartDate = str;
+    document.getElementById("s_startDate_display").textContent = label;
+    // sync hidden value for saveSettings
+    document.getElementById("s_startDate_hidden").value = str;
+  } else {
+    settingsTargetDate = str;
+    document.getElementById("s_targetDate_display").textContent = label;
+    document.getElementById("s_targetDate_hidden").value = str;
+  }
+  updateSettingsPreview();
+}
+
 function shiftDate(which, delta) {
   if (which === 'calDate') {
     calDate.setDate(calDate.getDate() + delta);
@@ -667,10 +714,11 @@ function shiftDate(which, delta) {
 }
 
 function calcTDEE(weightLbs) {
-  // Mifflin-St Jeor for Erin's stats: 30yo, 5'4" (162.6cm), sedentary (x1.2)
+  // Mifflin-St Jeor for Erin's stats: 30yo, 5'4" (162.6cm)
   var kg = weightLbs * 0.453592;
   var bmr = (10 * kg) + (6.25 * 162.6) - (5 * 30) - 161;
-  return Math.round(bmr * 1.2);
+  var multiplier = state.settings.activityLevel === "lightly_active" ? 1.375 : 1.2;
+  return Math.round(bmr * multiplier);
 }
 
 function save() {
@@ -686,6 +734,7 @@ function load() {
         state.settings = parsed.settings;
         if (!state.settings.goalWeight) state.settings.goalWeight = 145;
         if (!state.settings.targetDate) state.settings.targetDate = "2026-08-01";
+        if (!state.settings.activityLevel) state.settings.activityLevel = "sedentary";
       }
       if (parsed.log) state.log = parsed.log;
       if (parsed.weighIns) state.weighIns = parsed.weighIns;
@@ -927,7 +976,7 @@ function updateSettingsPreview() {
   var sw = parseFloat(document.getElementById("s_startWeight").value) || state.settings.startWeight;
   var goal = parseFloat(document.getElementById("s_goalWeight").value) || state.settings.goalWeight;
   var tdee = parseInt(document.getElementById("s_tdee").value) || state.settings.tdee;
-  var targetDate = document.getElementById("s_targetDate").value || state.settings.targetDate;
+  var targetDate = document.getElementById("s_targetDate_hidden").value || state.settings.targetDate;
 
   // Use latest weigh-in weight if available
   var currentW = sw;
@@ -942,14 +991,26 @@ function updateSettingsPreview() {
   }
 }
 
+function setActivity(level) {
+  state.settings.activityLevel = level;
+  document.getElementById("btn_sedentary").className = "toggle-btn" + (level === "sedentary" ? " toggle-btn-active" : "");
+  document.getElementById("btn_lightly_active").className = "toggle-btn" + (level === "lightly_active" ? " toggle-btn-active" : "");
+  updateSettingsPreview();
+}
+
 function openSettings() {
-  document.getElementById("s_startWeight").value = state.settings.startWeight;
-  document.getElementById("s_startDate").value = state.settings.startDate;
+  setActivity(state.settings.activityLevel || "sedentary");
+  settingsStartDate = state.settings.startDate;
+  settingsTargetDate = state.settings.targetDate;
   document.getElementById("s_startDate_display").textContent = strToDate(state.settings.startDate).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"});
+  document.getElementById("s_targetDate_display").textContent = strToDate(state.settings.targetDate).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"});
+  document.getElementById("s_startDate_hidden").value = state.settings.startDate;
+  document.getElementById("s_targetDate_hidden").value = state.settings.targetDate;
+  document.getElementById("s_startWeight").value = state.settings.startWeight;
+
   document.getElementById("s_tdee").value = state.settings.tdee;
   document.getElementById("s_goalWeight").value = state.settings.goalWeight;
-  document.getElementById("s_targetDate").value = state.settings.targetDate;
-  document.getElementById("s_targetDate_display").textContent = strToDate(state.settings.targetDate).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"});
+
   updateSettingsPreview();
   document.getElementById("overlay").classList.add("open");
 }
@@ -964,10 +1025,11 @@ function overlayClick(e) {
 
 function saveSettings() {
   var sw = parseFloat(document.getElementById("s_startWeight").value);
-  var sd = document.getElementById("s_startDate").value;
+  var sd = document.getElementById("s_startDate_hidden").value;
   var tdee = parseInt(document.getElementById("s_tdee").value);
   var gw = parseFloat(document.getElementById("s_goalWeight").value);
-  var td = document.getElementById("s_targetDate").value;
+  var td = document.getElementById("s_targetDate_hidden").value;
+  // activityLevel saved live via setActivity(), no extra step needed
   if (!isNaN(sw)) state.settings.startWeight = sw;
   if (sd) state.settings.startDate = sd;
   if (!isNaN(tdee)) state.settings.tdee = tdee;
