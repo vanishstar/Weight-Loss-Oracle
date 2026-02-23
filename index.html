@@ -8,159 +8,247 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Weight Tracker</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-:root {
-–bg: #f5f2ee;
-–surface: #ffffff;
-–header: #2c2420;
-–text: #1a1614;
-–text-mid: #3d3330;
-–text-muted: #6b5d57;
-–border: #d4c8be;
-–accent: #c8b89a;
-–green: #1e5c38;
-–green-bg: #e6f4ec;
-–amber: #7a4800;
-–amber-bg: #fff3e0;
-–red: #7a1818;
-–red-bg: #fde8e8;
-–font: ‘system-ui’, ‘-apple-system’, ‘Segoe UI’, sans-serif;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 body {
-font-family: var(–font);
-background: var(–bg);
-color: var(–text);
+font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
+background: #f5f2ee;
+color: #1a1614;
 min-height: 100vh;
-min-height: -webkit-fill-available;
 }
 
-/* HEADER */
 .header {
-background: var(–header);
+background: #2c2420;
 padding: 18px 20px;
 padding-top: calc(18px + env(safe-area-inset-top));
 display: flex;
 justify-content: space-between;
 align-items: center;
 }
-.header-sub { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(–accent); text-transform: uppercase; margin-bottom: 3px; }
-.header-title { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.4px; }
+.header-sub {
+font-size: 11px;
+font-weight: 700;
+letter-spacing: 2px;
+color: #c8b89a;
+text-transform: uppercase;
+margin-bottom: 3px;
+}
+.header-title {
+font-size: 22px;
+font-weight: 700;
+color: #ffffff;
+letter-spacing: -0.4px;
+}
 .settings-btn {
-background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25);
-color: #fff; padding: 8px 16px; font-size: 14px; font-weight: 600;
-border-radius: 8px; font-family: var(–font); cursor: pointer;
+background: rgba(255,255,255,0.12);
+border: 1.5px solid rgba(255,255,255,0.25);
+color: #ffffff;
+padding: 8px 16px;
+font-size: 14px;
+font-weight: 600;
+border-radius: 8px;
+font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
+cursor: pointer;
 }
 
-/* MAIN */
-.main { padding: 14px 16px; max-width: 520px; margin: 0 auto; }
+.main {
+padding: 14px 16px;
+max-width: 520px;
+margin: 0 auto;
+}
 
-/* CARDS */
 .card {
-background: var(–surface); border-radius: 14px;
-padding: 22px 20px; margin-bottom: 10px;
+background: #ffffff;
+border-radius: 14px;
+padding: 22px 20px;
+margin-bottom: 10px;
 box-shadow: 0 1px 6px rgba(0,0,0,0.07);
 }
 .card-label {
-font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
-color: var(–text-muted); text-transform: uppercase; margin-bottom: 14px;
+font-size: 12px;
+font-weight: 700;
+letter-spacing: 1.5px;
+color: #6b5d57;
+text-transform: uppercase;
+margin-bottom: 14px;
 }
 
-/* PROJECTION */
 .projection-card { text-align: center; }
 .projection-number {
-font-size: 68px; font-weight: 800; line-height: 1;
-letter-spacing: -3px; margin-bottom: 4px;
+font-size: 68px;
+font-weight: 800;
+line-height: 1;
+letter-spacing: -3px;
+margin-bottom: 4px;
+color: #6b5d57;
 }
-.projection-unit { font-size: 18px; color: var(–text-muted); font-weight: 500; margin-bottom: 18px; }
-.stats-row { display: flex; border-top: 1px solid var(–border); padding-top: 16px; gap: 4px; }
+.projection-unit {
+font-size: 18px;
+color: #6b5d57;
+font-weight: 500;
+margin-bottom: 18px;
+}
+.stats-row {
+display: flex;
+border-top: 1px solid #d4c8be;
+padding-top: 16px;
+gap: 4px;
+}
 .stat { text-align: center; flex: 1; }
-.stat-value { font-size: 22px; font-weight: 800; color: var(–text); letter-spacing: -0.5px; }
-.stat-label { font-size: 12px; color: var(–text-muted); margin-top: 3px; font-weight: 600; }
+.stat-value {
+font-size: 22px;
+font-weight: 800;
+color: #1a1614;
+letter-spacing: -0.5px;
+}
+.stat-label {
+font-size: 12px;
+color: #6b5d57;
+margin-top: 3px;
+font-weight: 600;
+}
 .status-badge {
-margin-top: 14px; padding: 10px 14px;
-border-radius: 8px; font-size: 14px; font-weight: 600; line-height: 1.4;
+margin-top: 14px;
+padding: 10px 14px;
+border-radius: 8px;
+font-size: 14px;
+font-weight: 600;
+line-height: 1.4;
 }
-.empty-msg { color: var(–text-muted); font-size: 15px; }
+.empty-msg { color: #6b5d57; font-size: 15px; }
 
-/* CURRENT WEIGHT ROW */
 .current-row {
-background: var(–surface); border-radius: 12px; padding: 13px 18px;
-margin-bottom: 10px; display: flex; justify-content: space-between;
-align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+background: #ffffff;
+border-radius: 12px;
+padding: 13px 18px;
+margin-bottom: 10px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
-.current-label { font-size: 15px; color: var(–text-mid); font-weight: 500; }
-.current-value { font-size: 20px; font-weight: 800; color: var(–text); }
+.current-label { font-size: 15px; color: #3d3330; font-weight: 500; }
+.current-value { font-size: 20px; font-weight: 800; color: #1a1614; }
 
-/* LOG FORM */
 .log-row { display: flex; gap: 10px; align-items: flex-start; }
 .field { display: flex; flex-direction: column; }
-.field-date { flex: 0 0 auto; }
 .field-cals { flex: 1; min-width: 0; }
-label { font-size: 13px; font-weight: 600; color: var(–text-muted); margin-bottom: 6px; display: block; }
-input[type=“date”], input[type=“number”] {
-padding: 11px 14px; border: 1.5px solid var(–border);
-border-radius: 8px; font-size: 16px; background: #fff;
-color: var(–text); outline: none; height: 46px;
-font-family: var(–font); width: 100%;
--webkit-appearance: none; appearance: none;
+
+label {
+font-size: 13px;
+font-weight: 600;
+color: #6b5d57;
+margin-bottom: 6px;
+display: block;
+}
+input[type=“date”],
+input[type=“number”] {
+padding: 11px 14px;
+border: 1.5px solid #d4c8be;
+border-radius: 8px;
+font-size: 16px;
+background: #ffffff;
+color: #1a1614;
+outline: none;
+height: 46px;
+font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
+width: 100%;
+-webkit-appearance: none;
+appearance: none;
 }
 input[type=“date”] { width: 136px; }
+input[type=“number”] { width: 100%; }
+
 .add-btn-wrap { flex: 0 0 auto; padding-top: 23px; }
 .add-btn {
-background: var(–header); color: #fff; border: none;
-padding: 0 16px; font-size: 15px; font-weight: 700;
-border-radius: 8px; height: 46px; font-family: var(–font); cursor: pointer;
+background: #2c2420;
+color: #ffffff;
+border: none;
+padding: 0 16px;
+font-size: 15px;
+font-weight: 700;
+border-radius: 8px;
+height: 46px;
+font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
+cursor: pointer;
 white-space: nowrap;
 }
 
-/* HISTORY */
-.history-scroll { max-height: 280px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.history-row {
-display: flex; justify-content: space-between; align-items: center;
-padding: 12px 0; border-bottom: 1px solid var(–border);
+.history-scroll {
+max-height: 280px;
+overflow-y: auto;
+-webkit-overflow-scrolling: touch;
 }
-.history-date { font-size: 16px; font-weight: 600; color: var(–text-mid); }
+.history-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 12px 0;
+border-bottom: 1px solid #d4c8be;
+}
+.history-date { font-size: 16px; font-weight: 600; color: #3d3330; }
 .history-right { display: flex; align-items: center; gap: 8px; }
-.history-cals { font-size: 16px; font-weight: 700; color: var(–text); }
+.history-cals { font-size: 16px; font-weight: 700; color: #1a1614; }
 .deficit-badge { font-size: 13px; font-weight: 600; padding: 3px 7px; border-radius: 5px; }
 .delete-btn {
-background: none; border: none; color: var(–text-muted);
-font-size: 22px; padding: 0 4px; line-height: 1; cursor: pointer;
-font-family: var(–font);
+background: none;
+border: none;
+color: #6b5d57;
+font-size: 22px;
+padding: 0 4px;
+line-height: 1;
+cursor: pointer;
+font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
 }
 
-/* SETTINGS SHEET */
 .overlay {
-position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-display: flex; align-items: flex-end; justify-content: center;
-z-index: 100; display: none;
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.4);
+display: none;
+align-items: flex-end;
+justify-content: center;
+z-index: 100;
 }
 .overlay.open { display: flex; }
 .sheet {
-background: var(–bg); border-radius: 18px 18px 0 0;
+background: #f5f2ee;
+border-radius: 18px 18px 0 0;
 padding: 28px 20px 40px;
 padding-bottom: calc(40px + env(safe-area-inset-bottom));
-width: 100%; max-width: 520px;
+width: 100%;
+max-width: 520px;
 box-shadow: 0 -4px 30px rgba(0,0,0,0.15);
 }
-.sheet-title { font-size: 20px; font-weight: 700; color: var(–text); margin-bottom: 22px; }
+.sheet-title { font-size: 20px; font-weight: 700; color: #1a1614; margin-bottom: 22px; }
 .setting-field { margin-bottom: 16px; }
 .setting-field input { width: 100%; }
-.hint { font-size: 14px; color: var(–text-muted); margin-top: -8px; margin-bottom: 24px; line-height: 1.5; }
+.hint { font-size: 14px; color: #6b5d57; margin-top: -8px; margin-bottom: 24px; line-height: 1.5; }
 .sheet-buttons { display: flex; gap: 12px; }
 .cancel-btn {
-flex: 1; background: none; border: 1.5px solid var(–border);
-color: var(–text-mid); padding: 14px; border-radius: 10px;
-font-size: 16px; font-weight: 600; font-family: var(–font); cursor: pointer;
+flex: 1;
+background: none;
+border: 1.5px solid #d4c8be;
+color: #3d3330;
+padding: 14px;
+border-radius: 10px;
+font-size: 16px;
+font-weight: 600;
+font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
+cursor: pointer;
 }
 .save-btn {
-flex: 1; background: var(–header); color: #fff; border: none;
-padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 600;
-font-family: var(–font); cursor: pointer;
+flex: 1;
+background: #2c2420;
+color: #ffffff;
+border: none;
+padding: 14px;
+border-radius: 10px;
+font-size: 16px;
+font-weight: 600;
+font-family: -apple-system, system-ui, “Segoe UI”, sans-serif;
+cursor: pointer;
 }
-
 .spacer { height: 20px; }
 </style>
 
@@ -177,36 +265,30 @@ font-family: var(–font); cursor: pointer;
 
 <div class="main">
 
-  <!-- Projection card -->
-
-  <div class="card projection-card" id="projCard">
-    <div class="card-label">Projected Weight · Aug 1st</div>
-    <div class="projection-number" id="projNum">—</div>
+  <div class="card projection-card">
+    <div class="card-label">Projected Weight &middot; Aug 1st</div>
+    <div class="projection-number" id="projNum">&#8212;</div>
     <div class="projection-unit">lbs</div>
     <div id="projStats" style="display:none">
       <div class="stats-row">
-        <div class="stat"><div class="stat-value" id="avgCal">—</div><div class="stat-label">Avg cal/day</div></div>
-        <div class="stat"><div class="stat-value" id="avgDef">—</div><div class="stat-label">Daily deficit</div></div>
-        <div class="stat"><div class="stat-value" id="daysLeft">—</div><div class="stat-label">Days left</div></div>
+        <div class="stat"><div class="stat-value" id="avgCal">&#8212;</div><div class="stat-label">Avg cal/day</div></div>
+        <div class="stat"><div class="stat-value" id="avgDef">&#8212;</div><div class="stat-label">Daily deficit</div></div>
+        <div class="stat"><div class="stat-value" id="daysLeft">&#8212;</div><div class="stat-label">Days left</div></div>
       </div>
       <div class="status-badge" id="statusBadge"></div>
     </div>
     <div class="empty-msg" id="emptyMsg">Log your first day below to see your projection.</div>
   </div>
 
-  <!-- Current estimate -->
-
   <div class="current-row" id="currentRow" style="display:none">
     <span class="current-label">Est. current weight</span>
-    <span class="current-value" id="currentVal">—</span>
+    <span class="current-value" id="currentVal">&#8212;</span>
   </div>
-
-  <!-- Log form -->
 
   <div class="card">
     <div class="card-label">Log a Day</div>
     <div class="log-row">
-      <div class="field field-date">
+      <div class="field">
         <label for="dateInput">Date</label>
         <input type="date" id="dateInput">
       </div>
@@ -220,8 +302,6 @@ font-family: var(–font); cursor: pointer;
     </div>
   </div>
 
-  <!-- History -->
-
   <div class="card" id="historyCard" style="display:none">
     <div class="card-label" id="historyLabel">History</div>
     <div class="history-scroll" id="historyList"></div>
@@ -229,8 +309,6 @@ font-family: var(–font); cursor: pointer;
 
   <div class="spacer"></div>
 </div>
-
-<!-- Settings sheet -->
 
 <div class="overlay" id="overlay" onclick="overlayClick(event)">
   <div class="sheet">
@@ -247,7 +325,7 @@ font-family: var(–font); cursor: pointer;
       <label for="s_tdee">Maintenance calories (TDEE)</label>
       <input type="number" id="s_tdee">
     </div>
-    <div class="hint">Calories to maintain your current weight. Based on your stats, yours is about 1,750.</div>
+    <p class="hint">Calories to maintain your current weight. Based on your stats, yours is about 1,750.</p>
     <div class="sheet-buttons">
       <button class="cancel-btn" onclick="closeSettings()">Cancel</button>
       <button class="save-btn" onclick="saveSettings()">Save</button>
@@ -256,66 +334,68 @@ font-family: var(–font); cursor: pointer;
 </div>
 
 <script>
-const STORAGE_KEY = "wl-tracker-v2";
-const AUG1 = new Date("2026-08-01T00:00:00");
+var STORAGE_KEY = "wl-tracker-v2";
+var AUG1 = new Date("2026-08-01T00:00:00");
 
-// --- STATE ---
-let state = {
+var state = {
   settings: { startWeight: 166.6, startDate: todayStr(), tdee: 1750 },
-  log: [] // [{date: "YYYY-MM-DD", calories: N}]
+  log: []
 };
 
-// --- STORAGE ---
 function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
 }
 
 function load() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    var raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw);
+      var parsed = JSON.parse(raw);
       if (parsed.settings) state.settings = parsed.settings;
       if (parsed.log) state.log = parsed.log;
     }
   } catch(e) {}
 }
 
-// --- UTILS ---
 function todayStr() {
-  const t = new Date();
-  return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`;
+  var t = new Date();
+  return t.getFullYear() + "-" + pad(t.getMonth()+1) + "-" + pad(t.getDate());
 }
+
+function pad(n) { return String(n).padStart(2, "0"); }
 
 function daysBetween(a, b) {
   return Math.round((b - a) / (1000*60*60*24));
 }
 
 function formatDate(dateStr) {
-  const [y,m,d] = dateStr.split("-").map(Number);
-  return new Date(y, m-1, d).toLocaleDateString("en-US", {month:"short", day:"numeric"});
+  var parts = dateStr.split("-").map(Number);
+  return new Date(parts[0], parts[1]-1, parts[2]).toLocaleDateString("en-US", {month:"short", day:"numeric"});
 }
 
-// --- RENDER ---
 function render() {
-  const today = new Date(); today.setHours(0,0,0,0);
-  const daysToAug1 = daysBetween(today, AUG1);
-  const startDateObj = new Date(state.settings.startDate + "T00:00:00");
-  const totalDays = daysBetween(startDateObj, AUG1);
-  const daysSinceStart = daysBetween(startDateObj, today);
+  var today = new Date(); today.setHours(0,0,0,0);
+  var daysToAug1 = daysBetween(today, AUG1);
+  var startDateObj = new Date(state.settings.startDate + "T00:00:00");
+  var totalDays = daysBetween(startDateObj, AUG1);
+  var daysSinceStart = daysBetween(startDateObj, today);
 
-  const hasLog = state.log.length > 0;
-  const avgCalories = hasLog ? Math.round(state.log.reduce((s,e) => s+e.calories, 0) / state.log.length) : null;
-  const avgDeficit = avgCalories !== null ? state.settings.tdee - avgCalories : null;
-  const projectedWeight = avgDeficit !== null ? state.settings.startWeight - (avgDeficit * totalDays) / 3500 : null;
-  const currentEstimate = avgDeficit !== null ? state.settings.startWeight - (avgDeficit * daysSinceStart) / 3500 : null;
+  var hasLog = state.log.length > 0;
+  var avgCalories = null, avgDeficit = null, projectedWeight = null, currentEstimate = null;
 
-  // Projection number
-  const projNum = document.getElementById("projNum");
-  projNum.textContent = projectedWeight !== null ? projectedWeight.toFixed(1) : "—";
+  if (hasLog) {
+    var sum = 0;
+    for (var i = 0; i < state.log.length; i++) sum += state.log[i].calories;
+    avgCalories = Math.round(sum / state.log.length);
+    avgDeficit = state.settings.tdee - avgCalories;
+    projectedWeight = state.settings.startWeight - (avgDeficit * totalDays) / 3500;
+    currentEstimate = state.settings.startWeight - (avgDeficit * daysSinceStart) / 3500;
+  }
 
-  // Status color
-  let color = "#6b5d57", bg = "#f5f2ee";
+  var projNum = document.getElementById("projNum");
+  projNum.textContent = projectedWeight !== null ? projectedWeight.toFixed(1) : "\u2014";
+
+  var color = "#6b5d57", bg = "#f5f2ee";
   if (projectedWeight !== null) {
     if (projectedWeight <= 145)      { color = "#1e5c38"; bg = "#e6f4ec"; }
     else if (projectedWeight <= 150) { color = "#7a4800"; bg = "#fff3e0"; }
@@ -323,28 +403,27 @@ function render() {
   }
   projNum.style.color = color;
 
-  // Stats
-  const projStats = document.getElementById("projStats");
-  const emptyMsg = document.getElementById("emptyMsg");
+  var projStats = document.getElementById("projStats");
+  var emptyMsg = document.getElementById("emptyMsg");
+
   if (hasLog) {
     projStats.style.display = "block";
     emptyMsg.style.display = "none";
-    document.getElementById("avgCal").textContent = avgCalories?.toLocaleString() ?? "—";
-    document.getElementById("avgDef").textContent = avgDeficit !== null ? (avgDeficit > 0 ? `+${avgDeficit}` : avgDeficit) : "—";
+    document.getElementById("avgCal").textContent = avgCalories.toLocaleString();
+    document.getElementById("avgDef").textContent = avgDeficit > 0 ? "+" + avgDeficit : String(avgDeficit);
     document.getElementById("daysLeft").textContent = daysToAug1;
-    const badge = document.getElementById("statusBadge");
+    var badge = document.getElementById("statusBadge");
     badge.style.background = bg;
     badge.style.color = color;
     badge.textContent = projectedWeight <= 145
-      ? "✓ On track for your goal of 140–145 lbs"
-      : `${(projectedWeight - 145).toFixed(1)} lbs above goal range`;
+      ? "\u2713 On track for your goal of 140\u2013145 lbs"
+      : (projectedWeight - 145).toFixed(1) + " lbs above goal range";
   } else {
     projStats.style.display = "none";
     emptyMsg.style.display = "block";
   }
 
-  // Current estimate
-  const currentRow = document.getElementById("currentRow");
+  var currentRow = document.getElementById("currentRow");
   if (currentEstimate !== null) {
     currentRow.style.display = "flex";
     document.getElementById("currentVal").textContent = currentEstimate.toFixed(1) + " lbs";
@@ -352,47 +431,48 @@ function render() {
     currentRow.style.display = "none";
   }
 
-  // History
-  const historyCard = document.getElementById("historyCard");
-  const historyList = document.getElementById("historyList");
+  var historyCard = document.getElementById("historyCard");
+  var historyList = document.getElementById("historyList");
   if (hasLog) {
     historyCard.style.display = "block";
-    document.getElementById("historyLabel").textContent = `History · ${state.log.length} ${state.log.length === 1 ? "day" : "days"}`;
-    const sorted = [...state.log].reverse();
-    historyList.innerHTML = sorted.map(entry => {
-      const deficit = state.settings.tdee - entry.calories;
-      const isDeficit = deficit >= 0;
-      const badgeColor = isDeficit ? "#1e5c38" : "#7a1818";
-      const badgeBg = isDeficit ? "#e6f4ec" : "#fde8e8";
-      const sign = isDeficit ? "−" : "+";
-      return `
-        <div class="history-row">
-          <span class="history-date">${formatDate(entry.date)}</span>
-          <div class="history-right">
-            <span class="history-cals">${entry.calories.toLocaleString()}</span>
-            <span class="deficit-badge" style="color:${badgeColor};background:${badgeBg}">${sign}${Math.abs(deficit)}</span>
-            <button class="delete-btn" onclick="removeEntry('${entry.date}')">×</button>
-          </div>
-        </div>`;
-    }).join("");
+    document.getElementById("historyLabel").textContent = "History \u00b7 " + state.log.length + (state.log.length === 1 ? " day" : " days");
+    var sorted = state.log.slice().reverse();
+    var html = "";
+    for (var j = 0; j < sorted.length; j++) {
+      var entry = sorted[j];
+      var deficit = state.settings.tdee - entry.calories;
+      var isDeficit = deficit >= 0;
+      var bc = isDeficit ? "#1e5c38" : "#7a1818";
+      var bb = isDeficit ? "#e6f4ec" : "#fde8e8";
+      var sign = isDeficit ? "\u2212" : "+";
+      html += '<div class="history-row">'
+        + '<span class="history-date">' + formatDate(entry.date) + '</span>'
+        + '<div class="history-right">'
+        + '<span class="history-cals">' + entry.calories.toLocaleString() + '</span>'
+        + '<span class="deficit-badge" style="color:' + bc + ';background:' + bb + '">' + sign + Math.abs(deficit) + '</span>'
+        + '<button class="delete-btn" onclick="removeEntry(\'' + entry.date + '\')">&times;</button>'
+        + '</div></div>';
+    }
+    historyList.innerHTML = html;
   } else {
     historyCard.style.display = "none";
   }
 }
 
-// --- ACTIONS ---
 function addEntry() {
-  const dateVal = document.getElementById("dateInput").value;
-  const calVal = document.getElementById("calInput").value;
-  const cals = parseInt(calVal);
+  var dateVal = document.getElementById("dateInput").value;
+  var calVal = document.getElementById("calInput").value;
+  var cals = parseInt(calVal);
   if (!dateVal || !calVal || isNaN(cals) || cals < 0) return;
-
-  const existing = state.log.findIndex(e => e.date === dateVal);
+  var existing = -1;
+  for (var i = 0; i < state.log.length; i++) {
+    if (state.log[i].date === dateVal) { existing = i; break; }
+  }
   if (existing >= 0) {
     state.log[existing] = { date: dateVal, calories: cals };
   } else {
     state.log.push({ date: dateVal, calories: cals });
-    state.log.sort((a,b) => a.date.localeCompare(b.date));
+    state.log.sort(function(a,b) { return a.date.localeCompare(b.date); });
   }
   document.getElementById("calInput").value = "";
   save();
@@ -400,12 +480,11 @@ function addEntry() {
 }
 
 function removeEntry(date) {
-  state.log = state.log.filter(e => e.date !== date);
+  state.log = state.log.filter(function(e) { return e.date !== date; });
   save();
   render();
 }
 
-// --- SETTINGS ---
 function openSettings() {
   document.getElementById("s_startWeight").value = state.settings.startWeight;
   document.getElementById("s_startDate").value = state.settings.startDate;
@@ -422,9 +501,9 @@ function overlayClick(e) {
 }
 
 function saveSettings() {
-  const sw = parseFloat(document.getElementById("s_startWeight").value);
-  const sd = document.getElementById("s_startDate").value;
-  const tdee = parseInt(document.getElementById("s_tdee").value);
+  var sw = parseFloat(document.getElementById("s_startWeight").value);
+  var sd = document.getElementById("s_startDate").value;
+  var tdee = parseInt(document.getElementById("s_tdee").value);
   if (!isNaN(sw)) state.settings.startWeight = sw;
   if (sd) state.settings.startDate = sd;
   if (!isNaN(tdee)) state.settings.tdee = tdee;
@@ -433,12 +512,10 @@ function saveSettings() {
   render();
 }
 
-// Enter key on calorie input
 document.getElementById("calInput").addEventListener("keydown", function(e) {
   if (e.key === "Enter") addEntry();
 });
 
-// --- INIT ---
 load();
 document.getElementById("dateInput").value = todayStr();
 render();
