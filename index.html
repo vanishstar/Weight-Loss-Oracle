@@ -452,9 +452,6 @@ input::placeholder { color: #b0a099; }
 
 <div class="main">
 
-  <!-- Debug banner (remove after fix) -->
-  <div id="debugBanner" style="display:none;background:#fff3e0;border:1.5px solid #e8c87a;border-radius:10px;padding:10px 16px;margin-bottom:10px;font-size:13px;color:#7a4800;"></div>
-
   <!-- Storage warning banner -->
   <div id="storageBanner" style="display:none;background:#fde8e8;border:1.5px solid #e8b4b4;border-radius:10px;padding:14px 16px;margin-bottom:10px;font-size:14px;color:#7a1818;line-height:1.5;">
     <strong>Data won't save between sessions.</strong> Your browser is blocking local storage — this often happens in Firefox private mode or with strict privacy settings. Try opening this page in Safari, or go to Firefox Settings &rarr; Data Management and make sure vanishstar.github.io is allowed.
@@ -731,10 +728,6 @@ function save() {
 
 var storageWarningShown = false;
 
-function setDebug(msg) {
-  var el = document.getElementById("debugBanner");
-  if (el) { el.textContent = "Debug: " + msg; el.style.display = "block"; }
-}
 function showStorageWarning() {
   if (storageWarningShown) return;
   storageWarningShown = true;
@@ -753,8 +746,8 @@ function testStorage() {
 
 function load() {
   var raw = null;
-  try { raw = localStorage.getItem(STORAGE_KEY); } catch(e) { setDebug("localStorage read failed: " + e); return; }
-  if (!raw) { setDebug("no saved data found"); return; }
+  try { raw = localStorage.getItem(STORAGE_KEY); } catch(e) { return; }
+  if (!raw) { return; }
   try {
     var parsed = JSON.parse(raw);
     if (parsed.settings) {
@@ -765,8 +758,7 @@ function load() {
     }
     if (parsed.log) state.log = parsed.log;
     if (parsed.weighIns) state.weighIns = parsed.weighIns;
-    setDebug("loaded " + (state.log ? state.log.length : 0) + " entries");
-  } catch(e) { setDebug("parse failed: " + e); }
+  } catch(e) {  }
 }
 
 function todayStr() {
@@ -1067,9 +1059,10 @@ function saveSettings() {
   render();
 }
 
-// Live preview in settings
-["s_startWeight","s_goalWeight","s_tdee","s_targetDate"].forEach(function(id) {
-  document.getElementById(id).addEventListener("input", updateSettingsPreview);
+// Live preview in settings (only inputs, not date-nav components)
+["s_startWeight","s_goalWeight","s_tdee"].forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) el.addEventListener("input", updateSettingsPreview);
 });
 
 document.getElementById("calInput").addEventListener("keydown", function(e) {
